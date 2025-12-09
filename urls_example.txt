@@ -1,0 +1,4 @@
+https://example.com
+https://api.example.com/v1/config
+https://staging.example.com/debug
+https://cdn.example.com/assets/app.js

@@ -1,0 +1,7 @@
+# Python 3.8+ required
+
+# Core dependencies
+httpx>=0.24.0
+psutil>=5.9.0
+tqdm>=4.65.0
+

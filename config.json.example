@@ -1,0 +1,31 @@
+{
+    "telegram": {
+        "bot_token": "YOUR_TELEGRAM_BOT_TOKEN_HERE",
+        "chat_id": "YOUR_TELEGRAM_CHAT_ID_HERE",
+        "enabled": false
+    },
+    "ollama": {
+        "url": "http://localhost:11434/api/generate",
+        "model": "qwen2.5:1.5b"
+    },
+    "scanning": {
+        "concurrent_requests": 10,
+        "timeout": 15.0,
+        "ai_rate_limit_delay": 0.5
+    },
+    "thresholds": {
+        "critical": 0.75,
+        "high": 0.6,
+        "min_secret_entropy": 3.0
+    },
+    "hardware": {
+        "cpu_threshold": 85,
+        "gpu_temp_threshold": 80,
+        "cooldown_duration": 30
+    },
+    "cache": {
+        "max_snippet_cache_size": 10000,
+        "ai_cache_ttl_hours": 1,
+        "ai_cache_db": "ai_cache.db"
+    }
+}
