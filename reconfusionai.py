@@ -842,44 +842,55 @@ def calculate_fusion_score(
 async def process_url(semaphore: asyncio.Semaphore, client: httpx.AsyncClient, url: str) -> Optional[Dict]:
     async with semaphore:
         try:
-            async with client.stream("GET", url) as response:
-                if response.status_code in [404, 401, 403, 500]:
-                    try:
-                        chunk_iter = response.aiter_bytes(chunk_size=2048)
-                        sample = await chunk_iter.__anext__()
-                        sample_text = sample.decode('utf-8', errors='ignore').lower()
-                        
-                        if 'stack trace' in sample_text or 'debug' in sample_text or 'exception' in sample_text:
-                            logger.info(f"[DEBUG] Error page with debug info: {url} ({response.status_code})")
-                        else:
-                            return None
-                    except StopAsyncIteration:
-                        return None
-                
-                if response.status_code not in [200, 403] and response.status_code not in [404, 401, 500]:
-                    return None
-
+            async with client.stream("GET", url, follow_redirects=True) as response:
+                # 1. Check Content-Type (Fast Fail)
                 content_type = response.headers.get("content-type", "").lower()
                 is_allowed_type = any(t in content_type for t in ALLOWED_CONTENT_TYPES)
-                if not is_allowed_type:
-                    return None
                 
+                # If content type is bad, we usually skip, UNLESS it's an error page that might contain leaked info?
+                # The original logic checked status code first for 404s.
+                # Let's read the first chunk regardless, to check for debug info in error pages.
+                
+                # Determine chunk size
                 is_javascript = "javascript" in content_type
                 chunk_size = MAX_CHUNK_SIZE_JS if is_javascript else MAX_CHUNK_SIZE_DEFAULT
                 
+                # 2. Read Initial Chunk (SINGLE PASS)
                 chunk_iterator = response.aiter_bytes(chunk_size=chunk_size)
                 try:
                     initial_bytes = await chunk_iterator.__anext__()
                 except StopAsyncIteration:
                     initial_bytes = b""
-                
-                try:
-                    initial_text = initial_bytes.decode('utf-8', errors='ignore')
                 except Exception as e:
-                    logger.error(f"[FILTER] Decode error for {url}: {e}")
+                    logger.warning(f"[FILTER] Stream error for {url}: {e}")
                     return None
 
+                try:
+                    initial_text = initial_bytes.decode('utf-8', errors='ignore')
+                except Exception:
+                    initial_text = ""
+
                 initial_lower = initial_text.lower()
+                
+                # 3. Logic Decision
+                # Case A: Error Page (4xx/5xx) -> Check for debug leaks
+                if response.status_code in [404, 401, 403, 500]:
+                    if any(x in initial_lower for x in ['stack trace', 'debug', 'exception', 'syntax error']):
+                        logger.info(f"[DEBUG] Error page with debug info: {url} ({response.status_code})")
+                        # Proceed to return this as a finding candidate (or survivor)
+                    else:
+                        return None # Standard error page, ignore
+                
+                # Case B: Success (200) -> Standard processing
+                elif response.status_code == 200:
+                    if not is_allowed_type:
+                        return None
+                
+                # Case C: Others -> Ignore
+                else:
+                    return None
+
+                # 4. Signature Check (Ignore common false positives like jquery, etc)
                 for sig in IGNORE_SIGNATURES:
                     if sig in initial_lower:
                         return None
@@ -890,7 +901,7 @@ async def process_url(semaphore: asyncio.Semaphore, client: httpx.AsyncClient, u
                     "content_type": content_type,
                     "status_code": response.status_code,
                     "chunk_size": len(initial_bytes),
-                    "response_handle": response  # Keep for controlled deep-scan
+                    "response_handle": None # Response is closed when context exits
                 }
 
         except httpx.RequestError as e:
@@ -898,6 +909,7 @@ async def process_url(semaphore: asyncio.Semaphore, client: httpx.AsyncClient, u
             return None
         except Exception as e:
             logger.exception(f"[FILTER] Unexpected error for {url}: {e}")
+            return None
             return None
 
 # ============================================================
