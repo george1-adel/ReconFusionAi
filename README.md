@@ -1,4 +1,4 @@
-# ReconFusionAI 🚀
+# ReconFusionAI 
 
 **Intelligent Web Asset Scanner with AI-Powered Contextual Analysis**
 
