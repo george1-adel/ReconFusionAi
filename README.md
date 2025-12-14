@@ -1,29 +1,36 @@
-# ReconFusionAI 
+# ReconFusionAI 🚀
 
 **Intelligent Web Asset Scanner with AI-Powered Contextual Analysis**
 
-ReconFusionAI is an advanced security reconnaissance tool that combines regex pattern matching with AI contextual reasoning to detect exposed secrets, credentials, and vulnerabilities across web applications.
+> **v3.1 Major Release**: Now featuring **1,183+ Detection Patterns** including Gitleaks, PII, and extensive Cloud Secrets!
+
+ReconFusionAI is an advanced security reconnaissance tool that combines massive regex pattern libraries with AI contextual reasoning (Ollama) to detect exposed secrets, credentials, PII, and vulnerabilities across web applications with unparalleled accuracy.
 
 ---
 
 ##  Features
 
-### Multi-Layer Detection System
-- **98 Detection Patterns** (63 CRITICAL + 35 DISCOVERY)
-- **AI Contextual Analysis** using Ollama (Qwen 2.5:1.5b)
-- **Contextual Fusion Scoring** - Intelligent risk assessment
-- **WordPress-Specific Patterns** (20 specialized patterns)
-- **Cloud Services Detection** (AWS, Google, Azure, DigitalOcean, Heroku)
-- **CI/CD Secrets** (GitHub, GitLab, NPM, Docker)
-- **Payment Systems** (Stripe, PayPal, Square)
+###  Massive Multi-Layer Detection System
+- **1,183+ Total Detection Patterns** (The "Brain" of the operation)
+  - **Gitleaks Integration**: 199+ high-fidelity patterns for Stripe, Slack, modern CI/CD tokens.
+  - **Secrets Database**: 803+ patterns for API Keys, AWS/GCP/Azure, SaaS tokens, and more.
+  - **PII Detection**: 97+ patterns for Credit Cards (Visa/Master), SSNs, Passports (US/UK/EU), and IDs.
+  - **Critical & Discovery**: 84 core patterns for reconnaissance and immediate threats.
 
-### Advanced Capabilities
-- **Hardware Monitoring** - Auto-cooldown on CPU/GPU overheating
-- **AI Result Caching** (SQLite with TTL)
-- **LRU Cache** for memory-efficient deduplication
-- **Dual Output System**:
-  - `findings.json` - Critical secrets with AI analysis
-  - `discoveries.json` - Reconnaissance data (S3 buckets, IPs, params)
+###  AI Contextual Intelligence
+- **Ollama Integration**: Uses `qwen2.5:1.5b` (or custom models) for reasoning.
+- **Contextual Fusion Scoring**: Doesn't just match regex; it understands *context* (e.g., "Is this API key in a config file or a comment?").
+- **False Positive Reduction**: AI filters out dummy data and example code.
+
+### ⚡ Advanced Capabilities
+- **Production Hardened**: Hardware monitoring (CPU/GPU auto-cooldown), Request Throttling, and Robust Error Handling.
+- **Efficient Caching**:
+  - **AI Cache (SQLite)**: Reduces redundant LLM calls (1h TTL).
+  - **Memory Cache (LRU)**: Efficiently handles duplicates during large scans.
+- **Modular Architecture**: Patterns separated into `external_patterns.py` for easy updates.
+- **Dual Output**:
+  - `findings.json` - Critical secrets with AI analysis.
+  - `discoveries.json` - Recon & passive intel.
 
 ---
 
@@ -31,20 +38,20 @@ ReconFusionAI is an advanced security reconnaissance tool that combines regex pa
 
 ### System Requirements
 - **Python**: 3.8+
-- **Ollama**: Latest version
-- **OS**: Linux, macOS, Windows (with WSL)
+- **Ollama**: Installed and running efficiently.
+- **OS**: Linux (Recommended), macOS, Windows (WSL).
 
-### Python Dependencies
+### Dependencies
 ```bash
 pip install -r requirements.txt
 ```
 
 ### AI Model (Ollama)
 ```bash
-# Install Ollama (if not installed)
+# Install Ollama
 curl https://ollama.ai/install.sh | sh
 
-# Pull required model
+# Pull the optimized model
 ollama pull qwen2.5:1.5b
 ```
 
@@ -53,26 +60,23 @@ ollama pull qwen2.5:1.5b
 ##  Installation
 
 ```bash
-# Clone repository
-git clone https://github.com/YOUR_USERNAME/ReconFusionAI.git
+# Clone the repository
+git clone https://github.com/george1-adel/ReconFusionAi.git
 cd ReconFusionAI
 
-# Install Python dependencies
+# Install Python requirements
 pip install -r requirements.txt
 
-# Install Ollama model
-ollama pull qwen2.5:1.5b
-
-# Copy and configure settings
-cp config.json config.json.example
+# Configure settings
+cp config.json.example config.json
 nano config.json
 ```
 
 ---
 
-##  Configuration
+## ⚙️ Configuration
 
-Edit `config.json`:
+Edit `config.json` to tailor the scanner to your hardware and needs:
 
 ```json
 {
@@ -92,12 +96,6 @@ Edit `config.json`:
 }
 ```
 
-### Telegram Setup (Optional)
-1. Create a bot via [@BotFather](https://t.me/BotFather)
-2. Get your chat ID from [@userinfobot](https://t.me/userinfobot)
-3. Update `config.json` with your credentials
-4. Set `"enabled": true`
-
 ---
 
 ##  Usage
@@ -107,199 +105,58 @@ Edit `config.json`:
 python3 reconfusionai.py urls.txt
 ```
 
-### Skip HTTP Validation (s-prefix)
+### Fast Scan (Skip Phase 1 HTTP Check)
+Useful for lists of URLs you know are valid or internal.
 ```bash
-# For trusted URLs, skip Phase 1 filtering
-python3 reconfusionai.py s-urls.txt
+python3 reconfusionai.py s-mylist.txt
 ```
+*(Prefix the filename with `s-` to bypass the initial connectivity check)*
 
-### Input File Format
-Create a text file with one URL per line:
+### Input Format
+Simple text file, one URL per line:
 ```
 https://example.com
-https://api.example.com/config.js
-https://staging.example.com/debug
+https://api.example.com/v1/config.js
+http://dev.internal-dashboard.com
 ```
 
 ---
 
-##  Output Files
+##  Detection Capabilities (v1)
 
-### findings.json
-Critical secrets with full AI analysis:
-```json
-{
-  "timestamp": "2025-12-09T03:00:00",
-  "url": "https://example.com/config.js",
-  "severity": "CRITICAL",
-  "final_score": 0.92,
-  "reasoning_chain": [
-    "→ Regex detected: STRIPE_KEY",
-    "→ AI identified as: Stripe production API key",
-    "→ AI risk assessment: 0.95",
-    "→ Final score: 0.92 (CRITICAL)"
-  ],
-  "regex_findings": [...],
-  "ai_analysis": [...],
-  "heuristic_enhancement": {...}
-}
-```
+Our pattern database (`external_patterns.py` + `patterns.py`) covers:
 
-### discoveries.json
-Reconnaissance data (no AI analysis):
-```json
-{
-  "timestamp": "2025-12-09T03:00:00",
-  "url": "https://example.com/app.js",
-  "pattern_name": "S3_BUCKET",
-  "match": "company-backups.s3.amazonaws.com",
-  "line_number": 127
-}
-```
+| Category | Count | Examples |
+|----------|-------|----------|
+| **Cloud Providers** | 150+ | AWS (Access/Secret), GCP, Azure, DigitalOcean, Heroku, Alibaba Cloud |
+| **SaaS & APIs** | 400+ | Stripe, Slack, Twilio, SendGrid, MailChimp, PayPal, Square, Shopify |
+| **DevOps & CI/CD** | 200+ | GitHub tokens, GitLab CI, Docker, NPM, PyPI, Artifactory, Snyk |
+| **PII / Privacy** | 97+ | Credit Cards, IBANs, SSNs, Passport Numbers, Phone Numbers, Emails |
+| **Crypto** | 20+ | Bitcoin addresses, Ethereum private keys, Wallet seeds |
+| **Infrastructure** | 100+ | Database URIs (Mongo, Postgres), Redis auth, SSH Private Keys |
 
 ---
 
-##  Detection Coverage
+## 🛡️ Security & Privacy
 
-### Cloud Providers (11 patterns)
-- AWS (Access Keys, Secret Keys, Session Tokens)
-- Google Cloud (API Keys, OAuth tokens)
-- Azure (Access Keys, SAS tokens)
-- Heroku, DigitalOcean, Mailgun
-
-### Authentication & Keys (29 patterns)
-- Private Keys (RSA, OpenSSH, PGP, Google Service Account)
-- JWT Tokens, Bearer tokens, Basic Auth
-- OAuth2 Refresh tokens
-
-### CI/CD & DevOps (5 patterns)
-- GitHub, GitLab tokens
-- NPM access tokens
-- Docker authentication
-- Slack, Discord webhooks
-
-### WordPress (20 patterns)
-- Database credentials
-- Authentication keys & salts
-- Debug logs, config backups
-- User enumeration endpoints
-- Vulnerable plugins
-
-### Reconnaissance (35 patterns)
-- S3 buckets, Google Storage, Azure Blobs
-- Internal IPs, internal domains
-- Dangerous parameters (XSS/SSRF/LFI indicators)
-- Client-side vulnerabilities (innerHTML, eval, postMessage)
-
----
-
-##  How It Works
-
-### 4-Stage Contextual Fusion Pipeline
-
-```
-
-  Stage 1: Regex Detection with Context     
-  Extract secrets with surrounding context  
-
-               
-               
-
-  Stage 2: AI Contextual Reasoning          
-  AI analyzes PURPOSE, RISK, RELATIONSHIP    
-
-               
-               
-
-  Stage 3: Heuristic Enhancement            
-  Type-specific rules (JWT, AWS, Stripe)    
-
-               
-               
-
-  Stage 4: Fusion Scoring                   
-  Intelligent risk calculation with chain   
-
-```
-
-**NOT** a simple weighted average - true contextual understanding!
-
----
-
-##  Security & Privacy
-
-- **Local AI Processing** - All analysis runs locally via Ollama
-- **No Cloud Dependencies** - No data sent to external services (except optional Telegram)
-- **Configurable Alerts** - Telegram notifications are optional
-- **Cache Isolation** - AI cache stored locally in SQLite
-
----
-
-##  Performance
-
-- **Concurrent Scanning**: 10 URLs simultaneously (configurable)
-- **Hardware Monitoring**: Auto-throttle on overheating
-- **Optimized Prompts**: ~400 chars vs traditional ~1500 chars
-- **AI Caching**: 60% reduction in redundant analysis
-- **Memory Efficient**: LRU cache with 10K entry limit
-
----
-
-##  Troubleshooting
-
-### Ollama Connection Error
-```bash
-# Check Ollama is running
-ollama list
-
-# Restart Ollama
-systemctl restart ollama  # Linux
-brew services restart ollama  # macOS
-```
-
-### High CPU/GPU Usage
-Adjust thresholds in `config.json`:
-```json
-{
-  "hardware": {
-    "cpu_threshold": 70,
-    "gpu_temp_threshold": 75
-  }
-}
-```
-
-### No Findings
-- Increase chunk size for deeper scanning
-- Check Ollama model is downloaded: `ollama pull qwen2.5:1.5b`
-- Verify URLs are accessible
-
----
-
-##  License
-
-MIT License - See LICENSE file for details
-
----
-
-##  Disclaimer
-
-This tool is for **authorized security testing only**. Unauthorized scanning of systems you don't own or have permission to test is illegal. The authors are not responsible for misuse.
+- **100% Local Processing**: AI analysis runs on your machine via Ollama. No data leaves your network.
+- **Safe Scanning**: Built-in rate limiting and hardware monitoring prevent system overload.
 
 ---
 
 ##  Contributing
 
-Contributions welcome! Please:
-1. Fork the repository
-2. Create a feature branch
-3. Submit a pull request
+Contributions are welcome! If you have new regex patterns or features:
+1. Fork the repo.
+2. Create your feature branch.
+3. Submit a Pull Request.
 
 ---
 
-##  Contact
+## ⚠️ Disclaimer
 
-For issues and feature requests, please use GitHub Issues.
+This tool is designed for **security professionals and authorized testing only**. Usage of ReconFusionAI for attacking targets without prior mutual consent is illegal. The developers assume no liability and are not responsible for any misuse or damage caused by this program.
 
 ---
 
-**Made with  for the Bug Bounty Community**
+**Made with and  for the Cyber Security Community**
