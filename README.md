@@ -2,7 +2,7 @@
 
 **Intelligent Web Asset Scanner with AI-Powered Contextual Analysis**
 
-> **v3.1 Major Release**: Now featuring **1,183+ Detection Patterns** including Gitleaks, PII, and extensive Cloud Secrets!
+> **v1 Major Release**: Now featuring **1,183+ Detection Patterns** including Gitleaks, PII, and extensive Cloud Secrets!
 
 ReconFusionAI is an advanced security reconnaissance tool that combines massive regex pattern libraries with AI contextual reasoning (Ollama) to detect exposed secrets, credentials, PII, and vulnerabilities across web applications with unparalleled accuracy.
 
