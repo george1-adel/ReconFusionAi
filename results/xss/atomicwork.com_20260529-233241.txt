@@ -1,0 +1,23 @@
+# XSS Hunt Results
+# Target: atomicwork.com
+# Date: Fri May 29 23:34:10 UTC 2026
+# Wayback: 1736 | gf xss: 250 | uro: 29 | Gxss: 8 | kxss: 3
+# Pipeline: waybackurls | gf xss | uro | Gxss | kxss
+============================================================
+
+### [SECTION 1] Gxss Reflections (8 found) ###
+------------------------------------------------------------
+https://blog.atomicwork.com/?p=Gxss
+
+https://blog.atomicwork.com/?page_id=Gxss
+
+https://explore.atomicwork.com/_hcms/mem/login?__hsfp=3744343308&__hssc=251091033.1.1719410307679&__hstc=251091033.c518398f205a75e44920d1f7b05a372c.1711971690493.1719400002769.1719410307679.323&redirect_url=Gxss
+
+https://support.atomicwork.com/_hcms/mem/login?redirect_url=Gxss
+
+
+### [SECTION 2] kxss Verified XSS (3 found) ###
+------------------------------------------------------------
+URL: https://explore.atomicwork.com/_hcms/mem/login?__hsfp=3744343308&__hssc=251091033.1.1719410307679&__hstc=251091033.c518398f205a75e44920d1f7b05a372c.1711971690493.1719400002769.1719410307679.323&redirect_url=Gxss Param: redirect_url Unfiltered: [' $ ( ) : ;] 
+URL: https://blog.atomicwork.com/?p=Gxss Param: p Unfiltered: [] 
+URL: https://blog.atomicwork.com/?page_id=Gxss Param: page_id Unfiltered: [] 
