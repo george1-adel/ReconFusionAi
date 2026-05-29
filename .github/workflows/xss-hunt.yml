@@ -115,9 +115,9 @@ jobs:
           echo "  → Found $GXSS_COUNT reflections"
 
           echo "[5/5] 🎣 Verifying with kxss..."
-          cat /tmp/gxss_out.txt | kxss 2>/dev/null | tee "$OUTFILE" || true
-
-          FINAL=$(wc -l < "$OUTFILE")
+          cat /tmp/gxss_out.txt | kxss 2>/dev/null > /tmp/kxss_out.txt || true
+          FINAL=$(wc -l < /tmp/kxss_out.txt)
+          echo "  → kxss verified: $FINAL"
 
           echo ""
           echo "============================================"
@@ -127,14 +127,35 @@ jobs:
           echo "     - XSS Candidates : $XSS_PARAMS"
           echo "     - After URO      : $URO_COUNT"
           echo "     - Reflections    : $GXSS_COUNT"
-          echo "     - Final Findings : $FINAL"
+          echo "     - kxss Verified  : $FINAL"
           echo "  💾 Saved to: $OUTFILE"
           echo "============================================"
 
-          # Save summary header into output file (prepend)
-          SUMMARY="# XSS Hunt Results\n# Target: $TARGET\n# Date: $(date)\n# Wayback: $TOTAL | gf xss: $XSS_PARAMS | uro: $URO_COUNT | Gxss: $GXSS_COUNT | Final: $FINAL\n# Pipeline: waybackurls | gf xss | uro | Gxss | kxss\n$(printf '=%.0s' {1..60})\n"
-          echo -e "$SUMMARY" | cat - "$OUTFILE" > /tmp/final_output.txt
-          mv /tmp/final_output.txt "$OUTFILE"
+          # Build the final output file with all sections
+          {
+            echo "# XSS Hunt Results"
+            echo "# Target: $TARGET"
+            echo "# Date: $(date)"
+            echo "# Wayback: $TOTAL | gf xss: $XSS_PARAMS | uro: $URO_COUNT | Gxss: $GXSS_COUNT | kxss: $FINAL"
+            echo "# Pipeline: waybackurls | gf xss | uro | Gxss | kxss"
+            printf '=%.0s' {1..60}; echo
+            echo ""
+            echo "### [SECTION 1] Gxss Reflections ($GXSS_COUNT found) ###"
+            printf -- '-%.0s' {1..60}; echo
+            if [ -s /tmp/gxss_out.txt ]; then
+              cat /tmp/gxss_out.txt
+            else
+              echo "(no reflections found)"
+            fi
+            echo ""
+            echo "### [SECTION 2] kxss Verified XSS ($FINAL found) ###"
+            printf -- '-%.0s' {1..60}; echo
+            if [ -s /tmp/kxss_out.txt ]; then
+              cat /tmp/kxss_out.txt
+            else
+              echo "(no verified XSS found)"
+            fi
+          } > "$OUTFILE"
 
       # ─────────────────────────────────────────────
       # 7. Commit & push results back to repo
