@@ -1,0 +1,7 @@
+# XSS Hunt Results
+# Target: phonepe.com
+# Date: Fri May 29 23:06:41 UTC 2026
+# Wayback: 68616 | gf xss: 9063 | uro: 68 | Gxss: 2 | Final: 0
+# Pipeline: waybackurls | gf xss | uro | Gxss | kxss
+============================================================
+
