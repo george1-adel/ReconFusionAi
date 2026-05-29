@@ -1,0 +1,19 @@
+# XSS Hunt Results
+# Target: pcfinancial.ca
+# Date: Fri May 29 23:30:09 UTC 2026
+# Wayback: 35 | gf xss: 1 | uro: 1 | Gxss: 6 | kxss: 0
+# Pipeline: waybackurls | gf xss | uro | Gxss | kxss
+============================================================
+
+### [SECTION 1] Gxss Reflections (6 found) ###
+------------------------------------------------------------
+https://www.pcfinancial.ca/m/english/credit-cards/pc-credit-cards/?language=en&region=Gxss&signinop=OB
+
+https://www.pcfinancial.ca/m/english/credit-cards/pc-credit-cards/?language=Gxss&region=ON&signinop=OB
+
+https://www.pcfinancial.ca/m/english/credit-cards/pc-credit-cards/?language=en&region=ON&signinop=Gxss
+
+
+### [SECTION 2] kxss Verified XSS (0 found) ###
+------------------------------------------------------------
+(no verified XSS found)
