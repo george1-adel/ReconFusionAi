@@ -1,0 +1,167 @@
+name: 🎯 XSS Hunter Pipeline
+
+on:
+  workflow_dispatch:
+    inputs:
+      target:
+        description: 'Target domain (e.g. example.com)'
+        required: true
+        type: string
+
+jobs:
+  xss-hunt:
+    name: Hunt XSS on ${{ github.event.inputs.target }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      # ─────────────────────────────────────────────
+      # 1. Checkout the repo
+      # ─────────────────────────────────────────────
+      - name: 📥 Checkout Repository
+        uses: actions/checkout@v4
+
+      # ─────────────────────────────────────────────
+      # 2. Setup Go (needed for most tools)
+      # ─────────────────────────────────────────────
+      - name: 🐹 Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.22'
+
+      # ─────────────────────────────────────────────
+      # 3. Setup Python (needed for uro)
+      # ─────────────────────────────────────────────
+      - name: 🐍 Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      # ─────────────────────────────────────────────
+      # 4. Install all tools
+      # ─────────────────────────────────────────────
+      - name: 🔧 Install Tools
+        run: |
+          echo "[*] Installing waybackurls..."
+          go install github.com/tomnomnom/waybackurls@latest
+
+          echo "[*] Installing gf..."
+          go install github.com/tomnomnom/gf@latest
+
+          echo "[*] Installing Gxss..."
+          go install github.com/KathanP19/Gxss@latest
+
+          echo "[*] Installing kxss..."
+          go install github.com/Emoe/kxss@latest
+
+          echo "[*] Installing uro (Python)..."
+          pip install uro --quiet
+
+          echo "[✓] All tools installed!"
+
+      # ─────────────────────────────────────────────
+      # 5. Setup gf XSS patterns
+      # ─────────────────────────────────────────────
+      - name: 📋 Setup GF Patterns
+        run: |
+          mkdir -p ~/.gf
+          git clone --depth=1 https://github.com/1ndianl33t/Gf-Patterns /tmp/gf-patterns
+          cp /tmp/gf-patterns/*.json ~/.gf/ 2>/dev/null || true
+
+          # Also add tomnomnom's default patterns
+          git clone --depth=1 https://github.com/tomnomnom/gf /tmp/gf-repo
+          cp /tmp/gf-repo/examples/*.json ~/.gf/ 2>/dev/null || true
+
+          echo "[✓] GF patterns ready!"
+          ls ~/.gf/
+
+      # ─────────────────────────────────────────────
+      # 6. Run the full XSS pipeline
+      # ─────────────────────────────────────────────
+      - name: 🚀 Run XSS Hunt Pipeline
+        env:
+          TARGET: ${{ github.event.inputs.target }}
+        run: |
+          echo "============================================"
+          echo "  🎯 Target: $TARGET"
+          echo "  📅 Date:   $(date '+%Y-%m-%d %H:%M:%S')"
+          echo "============================================"
+
+          OUTDIR="results/xss"
+          TIMESTAMP=$(date '+%Y%m%d-%H%M%S')
+          OUTFILE="${OUTDIR}/${TARGET}_${TIMESTAMP}.txt"
+
+          mkdir -p "$OUTDIR"
+
+          echo "[1/5] 🌐 Collecting URLs from Wayback Machine..."
+          echo "$TARGET" | waybackurls > /tmp/wayback_raw.txt
+          TOTAL=$(wc -l < /tmp/wayback_raw.txt)
+          echo "  → Found $TOTAL URLs"
+
+          echo "[2/5] 🔍 Filtering XSS-prone parameters with gf..."
+          cat /tmp/wayback_raw.txt | gf xss > /tmp/gf_xss.txt 2>/dev/null || true
+          XSS_PARAMS=$(wc -l < /tmp/gf_xss.txt)
+          echo "  → Filtered to $XSS_PARAMS XSS candidates"
+
+          echo "[3/5] 🧹 Deduplicating URLs with uro..."
+          cat /tmp/gf_xss.txt | uro > /tmp/uro_out.txt
+          URO_COUNT=$(wc -l < /tmp/uro_out.txt)
+          echo "  → Reduced to $URO_COUNT unique URLs"
+
+          echo "[4/5] 🔬 Testing with Gxss (reflection check)..."
+          cat /tmp/uro_out.txt | Gxss -c 50 > /tmp/gxss_out.txt 2>/dev/null || true
+          GXSS_COUNT=$(wc -l < /tmp/gxss_out.txt)
+          echo "  → Found $GXSS_COUNT reflections"
+
+          echo "[5/5] 🎣 Verifying with kxss..."
+          cat /tmp/gxss_out.txt | kxss 2>/dev/null | tee "$OUTFILE" || true
+
+          FINAL=$(wc -l < "$OUTFILE")
+
+          echo ""
+          echo "============================================"
+          echo "  ✅ Pipeline Complete!"
+          echo "  📊 Summary:"
+          echo "     - Wayback URLs   : $TOTAL"
+          echo "     - XSS Candidates : $XSS_PARAMS"
+          echo "     - After URO      : $URO_COUNT"
+          echo "     - Reflections    : $GXSS_COUNT"
+          echo "     - Final Findings : $FINAL"
+          echo "  💾 Saved to: $OUTFILE"
+          echo "============================================"
+
+          # Save summary header into output file (prepend)
+          SUMMARY="# XSS Hunt Results\n# Target: $TARGET\n# Date: $(date)\n# Wayback: $TOTAL | gf xss: $XSS_PARAMS | uro: $URO_COUNT | Gxss: $GXSS_COUNT | Final: $FINAL\n# Pipeline: waybackurls | gf xss | uro | Gxss | kxss\n$(printf '=%.0s' {1..60})\n"
+          echo -e "$SUMMARY" | cat - "$OUTFILE" > /tmp/final_output.txt
+          mv /tmp/final_output.txt "$OUTFILE"
+
+      # ─────────────────────────────────────────────
+      # 7. Commit & push results back to repo
+      # ─────────────────────────────────────────────
+      - name: 💾 Save Results to Repository
+        env:
+          TARGET: ${{ github.event.inputs.target }}
+        run: |
+          git config user.name  "XSS-Hunter[bot]"
+          git config user.email "xss-hunter@github-actions.local"
+
+          git add results/
+
+          if git diff --cached --quiet; then
+            echo "[!] No new findings to commit."
+          else
+            git commit -m "🎯 XSS Hunt: $TARGET — $(date '+%Y-%m-%d %H:%M')"
+            git push
+            echo "[✓] Results committed and pushed!"
+          fi
+
+      # ─────────────────────────────────────────────
+      # 8. Upload as artifact too (backup)
+      # ─────────────────────────────────────────────
+      - name: 📤 Upload Results as Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: xss-results-${{ github.event.inputs.target }}-${{ github.run_number }}
+          path: results/xss/
+          retention-days: 30
