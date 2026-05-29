@@ -1,0 +1,7 @@
+# XSS Hunt Results
+# Target: sierra.ai
+# Date: Fri May 29 23:07:51 UTC 2026
+# Wayback: 22346 | gf xss: 62 | uro: 18 | Gxss: 120 | Final: 0
+# Pipeline: waybackurls | gf xss | uro | Gxss | kxss
+============================================================
+
