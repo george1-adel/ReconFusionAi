@@ -1,0 +1,14 @@
+# XSS Hunt Results
+# Target: dpdgroup.co.uk
+# Date: Sat May 30 00:29:41 UTC 2026
+# Wayback: 828 | gf xss: 6 | uro: 1 | Gxss: 0 | kxss: 0
+# Pipeline: waybackurls | gf xss | uro | Gxss | kxss
+============================================================
+
+### [SECTION 1] Gxss Reflections (0 found) ###
+------------------------------------------------------------
+(no reflections found)
+
+### [SECTION 2] kxss Verified XSS (0 found) ###
+------------------------------------------------------------
+(no verified XSS found)
