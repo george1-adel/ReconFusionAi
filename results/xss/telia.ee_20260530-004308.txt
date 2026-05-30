@@ -1,0 +1,68 @@
+# XSS Hunt Results
+# Target: telia.ee
+# Date: Sat May 30 00:49:08 UTC 2026
+# Wayback: 111046 | gf xss: 17730 | uro: 668 | Gxss: 54 | kxss: 2
+# Pipeline: waybackurls | gf xss | uro | Gxss | kxss
+============================================================
+
+### [SECTION 1] Gxss Reflections (54 found) ###
+------------------------------------------------------------
+Error is invalid semicolon separator in query
+invalid semicolon separator in query
+Error is invalid semicolon separator in query
+invalid semicolon separator in query
+Error is invalid semicolon separator in query
+invalid semicolon separator in query
+Error is invalid semicolon separator in query
+invalid semicolon separator in query
+Error is invalid semicolon separator in query
+invalid semicolon separator in query
+Error is invalid semicolon separator in query
+invalid semicolon separator in query
+Error is invalid semicolon separator in query
+invalid semicolon separator in query
+Error is invalid semicolon separator in query
+invalid semicolon separator in query
+Error is invalid semicolon separator in query
+invalid semicolon separator in query
+Error is invalid semicolon separator in query
+invalid semicolon separator in query
+Error is invalid semicolon separator in query
+invalid semicolon separator in query
+Error is invalid semicolon separator in query
+invalid semicolon separator in query
+Error is invalid semicolon separator in query
+invalid semicolon separator in query
+Error is invalid semicolon separator in query
+invalid semicolon separator in query
+https://apis.telia.ee/customer/portal-support-api/api/menu/resolve?app=selfservice&brand=telia&isFromSelfService=false&isLoggedIn=false&lang=Gxss&segment=
+
+https://apis.telia.ee/customer/portal-support-api/api/menu/resolve?app=selfservice&brand=Gxss&isFromSelfService=false&isLoggedIn=false&lang=et&segment=
+
+https://digitark.telia.ee/?s=Gxss
+
+https://digitark.telia.ee/ru/?s=Gxss
+
+Error is invalid semicolon separator in query
+invalid semicolon separator in query
+Error is invalid semicolon separator in query
+invalid semicolon separator in query
+https://pakkumised.telia.ee/meetup/?lang=Gxss
+
+https://pakkumised.telia.ee/meetup/?lang=ru&utm_campaign=b2b-content-04-2022&utm_content=meetup-04-rus&utm_id=Gxss&utm_medium=textlink&utm_source=aripaev
+
+https://pakkumised.telia.ee/meetup/?lang=ru&utm_campaign=b2b-content-04-2022&utm_content=Gxss&utm_id=b2b-content-04-2022&utm_medium=textlink&utm_source=aripaev
+
+https://pakkumised.telia.ee/meetup/?lang=Gxss&utm_campaign=b2b-content-04-2022&utm_content=meetup-04-rus&utm_id=b2b-content-04-2022&utm_medium=textlink&utm_source=aripaev
+
+https://pakkumised.telia.ee/meetup/?lang=ru&utm_campaign=b2b-content-04-2022&utm_content=meetup-04-rus&utm_id=b2b-content-04-2022&utm_medium=textlink&utm_source=Gxss
+
+https://pakkumised.telia.ee/meetup/?lang=ru&utm_campaign=b2b-content-04-2022&utm_content=meetup-04-rus&utm_id=b2b-content-04-2022&utm_medium=Gxss&utm_source=aripaev
+
+https://pakkumised.telia.ee/meetup/?lang=ru&utm_campaign=Gxss&utm_content=meetup-04-rus&utm_id=b2b-content-04-2022&utm_medium=textlink&utm_source=aripaev
+
+
+### [SECTION 2] kxss Verified XSS (2 found) ###
+------------------------------------------------------------
+URL: https://digitark.telia.ee/?s=Gxss Param: s Unfiltered: [$ | ( ) ` : ; { }] 
+URL: https://digitark.telia.ee/ru/?s=Gxss Param: s Unfiltered: [$ | ( ) ` : ; { }] 
