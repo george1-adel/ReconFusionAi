@@ -95,12 +95,12 @@ jobs:
           mkdir -p "$OUTDIR"
 
           echo "[1/5] 🌐 Collecting URLs from Wayback Machine..."
-          echo "$TARGET" | waybackurls > /tmp/wayback_raw.txt
-          TOTAL=$(wc -l < /tmp/wayback_raw.txt)
+          echo "$TARGET" | waybackurls > /tmp/all_urls.txt
+          TOTAL=$(wc -l < /tmp/all_urls.txt)
           echo "  → Found $TOTAL URLs"
 
           echo "[2/5] 🔍 Filtering XSS-prone parameters with gf..."
-          cat /tmp/wayback_raw.txt | gf xss > /tmp/gf_xss.txt 2>/dev/null || true
+          cat /tmp/all_urls.txt | gf xss > /tmp/gf_xss.txt 2>/dev/null || true
           XSS_PARAMS=$(wc -l < /tmp/gf_xss.txt)
           echo "  → Filtered to $XSS_PARAMS XSS candidates"
 
