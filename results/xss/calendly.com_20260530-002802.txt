@@ -1,0 +1,14 @@
+# XSS Hunt Results
+# Target: calendly.com
+# Date: Sat May 30 00:29:03 UTC 2026
+# Wayback: 0 | gf xss: 0 | uro: 0 | Gxss: 0 | kxss: 0
+# Pipeline: waybackurls | gf xss | uro | Gxss | kxss
+============================================================
+
+### [SECTION 1] Gxss Reflections (0 found) ###
+------------------------------------------------------------
+(no reflections found)
+
+### [SECTION 2] kxss Verified XSS (0 found) ###
+------------------------------------------------------------
+(no verified XSS found)
