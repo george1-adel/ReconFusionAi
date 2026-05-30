@@ -167,13 +167,22 @@ jobs:
           git config user.name  "XSS-Hunter[bot]"
           git config user.email "xss-hunter@github-actions.local"
 
+          # Pull latest changes first to avoid push rejection
+          git pull origin main --rebase --autostash
+
           git add results/
 
           if git diff --cached --quiet; then
             echo "[!] No new findings to commit."
           else
             git commit -m "🎯 XSS Hunt: $TARGET — $(date '+%Y-%m-%d %H:%M')"
-            git push
+            # Retry push up to 3 times in case of concurrent runs
+            for i in 1 2 3; do
+              git push && break || {
+                echo "[!] Push failed (attempt $i), pulling and retrying..."
+                git pull origin main --rebase --autostash
+              }
+            done
             echo "[✓] Results committed and pushed!"
           fi
 
