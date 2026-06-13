@@ -1,0 +1,23 @@
+# XSS Hunt Results
+# Target: mee6.xyz
+# Date: Sat Jun 13 04:00:41 UTC 2026
+# Wayback: 84931 | gf xss: 7664 | uro: 82 | Gxss: 10 | kxss: 0
+# Pipeline: waybackurls | gf xss | uro | Gxss | kxss
+============================================================
+
+### [SECTION 1] Gxss Reflections (10 found) ###
+------------------------------------------------------------
+https://mee6.xyz/api/plugins/twitter/oauth-callback?oauth_token=A2BhAgAAAAABmSkzAAABh3c7h_I&oauth_verifier=Gxss
+
+Error is invalid semicolon separator in query
+invalid semicolon separator in query
+Error is invalid semicolon separator in query
+invalid semicolon separator in query
+Error is invalid semicolon separator in query
+invalid semicolon separator in query
+Error is invalid semicolon separator in query
+invalid semicolon separator in query
+
+### [SECTION 2] kxss Verified XSS (0 found) ###
+------------------------------------------------------------
+(no verified XSS found)
