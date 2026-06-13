@@ -1,0 +1,14 @@
+# XSS Hunt Results
+# Target: navi.com
+# Date: Sat Jun 13 03:59:36 UTC 2026
+# Wayback: 575 | gf xss: 131 | uro: 20 | Gxss: 0 | kxss: 0
+# Pipeline: waybackurls | gf xss | uro | Gxss | kxss
+============================================================
+
+### [SECTION 1] Gxss Reflections (0 found) ###
+------------------------------------------------------------
+(no reflections found)
+
+### [SECTION 2] kxss Verified XSS (0 found) ###
+------------------------------------------------------------
+(no verified XSS found)
